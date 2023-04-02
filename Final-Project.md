@@ -186,17 +186,17 @@ df2 <- sqlQuery(conn,
                                   	GEO VARCHAR(20) NOT NULL,
                                   	PRICE_PRERMT DECIMAL NOT NULL,
                                   	PRIMARY KEY (CD_ID)
-                                  	)",
-                	errors=FALSE
-                	)
+                                  	)"
+                    errors=FALSE
+                    )
 
-	if (df2 == -1){
-    	shcat ("An error has occurred.\n")
-    	msg <- odbcGetErrMsg(conn)
-    	print (msg)
-	} else {
-    	cat ("Table was created successfully.\n")
-	}
+    if (df2 == -1){
+        cat ("An error has occurred.\n")
+        msg <- odbcGetErrMsg(conn)
+        print (msg)
+    } else {
+        cat ("Table was created successfully.\n")
+    }
 ```
 
     Table was created successfully.
@@ -211,17 +211,7 @@ df3 <- sqlQuery(conn,
                                   	DATE DATE NOT NULL,
                                   	FXUSDCAD FLOAT(6) NOT NULL,
                                   	PRIMARY KEY (DFX_ID)
-                                  	)",
-                	errors=FALSE
-                	)
-
-	if (df3 == -1){
-    	shcat ("An error has occurred.\n")
-    	msg <- odbcGetErrMsg(conn)
-    	print (msg)
-	} else {
-    	cat ("Table was created successfully.\n")
-	}
+                                  	)"
 ```
 
     Table was created successfully.
@@ -378,6 +368,11 @@ sqlSave(conn, monthly_df, "MONTHLY_FX", append=TRUE, fast=FALSE, rownames=FALSE,
 sqlSave(conn, daily_df, "DAILY_FX", append=TRUE, fast=FALSE, rownames=FALSE, colnames=FALSE, verbose=FALSE)
 ```
 
+
+```R
+sqlSave(conn, crop_df, "CROP_DATA", append=TRUE, fast=FALSE, rownames=FALSE, colnames=FALSE, verbose=FALSE)
+```
+
 ## Now execute SQL queries using the RODBC R package to solve the assignment problems.
 
 ## Problem 3
@@ -389,7 +384,7 @@ sqlSave(conn, daily_df, "DAILY_FX", append=TRUE, fast=FALSE, rownames=FALSE, col
 
 
 ```R
-query = "SELECT COUNT(*) AS FARM_PRICE_RECORDS FROM FARM_PRICES"
+query = "SELECT COUNT(CD_ID)FROM FARM_PRICES"
 sqlQuery(conn,query)
 ```
 
@@ -397,7 +392,7 @@ sqlQuery(conn,query)
 <table>
 <caption>A data.frame: 1 × 1</caption>
 <thead>
-	<tr><th></th><th scope=col>FARM_PRICE_RECORDS</th></tr>
+	<tr><th></th><th scope=col>1</th></tr>
 	<tr><th></th><th scope=col>&lt;int&gt;</th></tr>
 </thead>
 <tbody>
@@ -416,7 +411,7 @@ sqlQuery(conn,query)
 
 
 ```R
-query = "SELECT GEO AS FARM_PRICES_INCLUDED_GEOGRAPHIES FROM FARM_PRICES GROUP BY GEO"
+query = "SELECT GEO FROM FARM_PRICES GROUP BY GEO"
 sqlQuery(conn,query)
 ```
 
@@ -424,7 +419,7 @@ sqlQuery(conn,query)
 <table>
 <caption>A data.frame: 2 × 1</caption>
 <thead>
-	<tr><th></th><th scope=col>FARM_PRICES_INCLUDED_GEOGRAPHIES</th></tr>
+	<tr><th></th><th scope=col>GEO</th></tr>
 	<tr><th></th><th scope=col>&lt;fct&gt;</th></tr>
 </thead>
 <tbody>
@@ -472,7 +467,8 @@ sqlQuery(conn,query)
 
 
 ```R
-query = "SELECT * FROM FARM_PRICES LIMIT 6"
+query = "SELECT * FROM FARM_PRICES 
+WHERE CROP_TYPE ='Rye' LIMIT 6"
 sqlQuery(conn,query)
 ```
 
@@ -484,12 +480,12 @@ sqlQuery(conn,query)
 	<tr><th></th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;date&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th></tr>
 </thead>
 <tbody>
-	<tr><th scope=row>1</th><td>0</td><td>1985-01-01</td><td>Barley</td><td>Alberta     </td><td>127</td></tr>
-	<tr><th scope=row>2</th><td>1</td><td>1985-01-01</td><td>Barley</td><td>Saskatchewan</td><td>121</td></tr>
-	<tr><th scope=row>3</th><td>2</td><td>1985-01-01</td><td>Canola</td><td>Alberta     </td><td>342</td></tr>
-	<tr><th scope=row>4</th><td>3</td><td>1985-01-01</td><td>Canola</td><td>Saskatchewan</td><td>339</td></tr>
-	<tr><th scope=row>5</th><td>4</td><td>1985-01-01</td><td>Rye   </td><td>Alberta     </td><td>100</td></tr>
-	<tr><th scope=row>6</th><td>5</td><td>1985-01-01</td><td>Rye   </td><td>Saskatchewan</td><td>109</td></tr>
+	<tr><th scope=row>1</th><td> 4</td><td>1985-01-01</td><td>Rye</td><td>Alberta     </td><td>100</td></tr>
+	<tr><th scope=row>2</th><td> 5</td><td>1985-01-01</td><td>Rye</td><td>Saskatchewan</td><td>109</td></tr>
+	<tr><th scope=row>3</th><td>10</td><td>1985-02-01</td><td>Rye</td><td>Alberta     </td><td> 95</td></tr>
+	<tr><th scope=row>4</th><td>11</td><td>1985-02-01</td><td>Rye</td><td>Saskatchewan</td><td>103</td></tr>
+	<tr><th scope=row>5</th><td>16</td><td>1985-03-01</td><td>Rye</td><td>Alberta     </td><td> 96</td></tr>
+	<tr><th scope=row>6</th><td>17</td><td>1985-03-01</td><td>Rye</td><td>Saskatchewan</td><td>106</td></tr>
 </tbody>
 </table>
 
@@ -504,7 +500,8 @@ sqlQuery(conn,query)
 
 
 ```R
-query = "SELECT GEO AS BARLEY_GROWING_PROVINCES FROM CROP_DATA WHERE CROP_TYPE='Barley'GROUP BY GEO"
+query = "SELECT GEO FROM CROP_DATA 
+WHERE CROP_TYPE='Barley'GROUP BY GEO"
 sqlQuery(conn,query)
 ```
 
@@ -512,7 +509,7 @@ sqlQuery(conn,query)
 <table>
 <caption>A data.frame: 3 × 1</caption>
 <thead>
-	<tr><th></th><th scope=col>BARLEY_GROWING_PROVINCES</th></tr>
+	<tr><th></th><th scope=col>GEO</th></tr>
 	<tr><th></th><th scope=col>&lt;fct&gt;</th></tr>
 </thead>
 <tbody>
@@ -532,7 +529,7 @@ sqlQuery(conn,query)
 
 
 ```R
-query = "SELECT min(DATE) AS FIRST_DATE, max(DATE) AS LAST_DATE
+query = "SELECT min(DATE), max(DATE)
 	FROM FARM_PRICES"
 sqlQuery(conn,query)
 ```
@@ -541,7 +538,7 @@ sqlQuery(conn,query)
 <table>
 <caption>A data.frame: 1 × 2</caption>
 <thead>
-	<tr><th></th><th scope=col>FIRST_DATE</th><th scope=col>LAST_DATE</th></tr>
+	<tr><th></th><th scope=col>1</th><th scope=col>2</th></tr>
 	<tr><th></th><th scope=col>&lt;date&gt;</th><th scope=col>&lt;date&gt;</th></tr>
 </thead>
 <tbody>
@@ -560,80 +557,81 @@ sqlQuery(conn,query)
 
 
 ```R
-query = "SELECT CROP_TYPE, GEO, DATE, PRICE_PRERMT FROM FARM_PRICES 
+query = "SELECT DISTINCT (CROP_TYPE), PRICE_PRERMT, YEAR(DATE) 
+AS YEAR FROM FARM_PRICES 
 WHERE PRICE_PRERMT >= 350 ORDER BY PRICE_PRERMT"
 sqlQuery(conn,query)
 ```
 
 
 <table>
-<caption>A data.frame: 469 × 4</caption>
+<caption>A data.frame: 397 × 3</caption>
 <thead>
-	<tr><th></th><th scope=col>CROP_TYPE</th><th scope=col>GEO</th><th scope=col>DATE</th><th scope=col>PRICE_PRERMT</th></tr>
-	<tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;date&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+	<tr><th></th><th scope=col>CROP_TYPE</th><th scope=col>PRICE_PRERMT</th><th scope=col>YEAR</th></tr>
+	<tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
 </thead>
 <tbody>
-	<tr><th scope=row>1</th><td>Canola</td><td>Alberta     </td><td>1985-03-01</td><td>350</td></tr>
-	<tr><th scope=row>2</th><td>Canola</td><td>Saskatchewan</td><td>1985-06-01</td><td>350</td></tr>
-	<tr><th scope=row>3</th><td>Canola</td><td>Alberta     </td><td>1995-08-01</td><td>350</td></tr>
-	<tr><th scope=row>4</th><td>Canola</td><td>Alberta     </td><td>2003-11-01</td><td>350</td></tr>
-	<tr><th scope=row>5</th><td>Canola</td><td>Alberta     </td><td>2007-02-01</td><td>350</td></tr>
-	<tr><th scope=row>6</th><td>Canola</td><td>Saskatchewan</td><td>2007-04-01</td><td>350</td></tr>
-	<tr><th scope=row>7</th><td>Canola</td><td>Alberta     </td><td>1999-02-01</td><td>351</td></tr>
-	<tr><th scope=row>8</th><td>Canola</td><td>Saskatchewan</td><td>2007-02-01</td><td>351</td></tr>
-	<tr><th scope=row>9</th><td>Canola</td><td>Alberta     </td><td>1997-10-01</td><td>352</td></tr>
-	<tr><th scope=row>10</th><td>Canola</td><td>Alberta     </td><td>1998-10-01</td><td>352</td></tr>
-	<tr><th scope=row>11</th><td>Canola</td><td>Alberta     </td><td>2003-05-01</td><td>352</td></tr>
-	<tr><th scope=row>12</th><td>Canola</td><td>Alberta     </td><td>2007-03-01</td><td>352</td></tr>
-	<tr><th scope=row>13</th><td>Canola</td><td>Saskatchewan</td><td>2007-03-01</td><td>352</td></tr>
-	<tr><th scope=row>14</th><td>Canola</td><td>Saskatchewan</td><td>2002-07-01</td><td>353</td></tr>
-	<tr><th scope=row>15</th><td>Canola</td><td>Alberta     </td><td>2003-12-01</td><td>353</td></tr>
-	<tr><th scope=row>16</th><td>Canola</td><td>Alberta     </td><td>2007-04-01</td><td>353</td></tr>
-	<tr><th scope=row>17</th><td>Canola</td><td>Alberta     </td><td>1985-05-01</td><td>354</td></tr>
-	<tr><th scope=row>18</th><td>Canola</td><td>Alberta     </td><td>1988-07-01</td><td>354</td></tr>
-	<tr><th scope=row>19</th><td>Canola</td><td>Saskatchewan</td><td>1988-07-01</td><td>354</td></tr>
-	<tr><th scope=row>20</th><td>Canola</td><td>Alberta     </td><td>2004-01-01</td><td>354</td></tr>
-	<tr><th scope=row>21</th><td>Canola</td><td>Saskatchewan</td><td>2004-08-01</td><td>354</td></tr>
-	<tr><th scope=row>22</th><td>Canola</td><td>Alberta     </td><td>1998-01-01</td><td>355</td></tr>
-	<tr><th scope=row>23</th><td>Canola</td><td>Alberta     </td><td>2003-04-01</td><td>356</td></tr>
-	<tr><th scope=row>24</th><td>Canola</td><td>Saskatchewan</td><td>2003-04-01</td><td>356</td></tr>
-	<tr><th scope=row>25</th><td>Canola</td><td>Alberta     </td><td>1994-04-01</td><td>357</td></tr>
-	<tr><th scope=row>26</th><td>Canola</td><td>Saskatchewan</td><td>1994-12-01</td><td>357</td></tr>
-	<tr><th scope=row>27</th><td>Canola</td><td>Saskatchewan</td><td>2004-02-01</td><td>357</td></tr>
-	<tr><th scope=row>28</th><td>Canola</td><td>Alberta     </td><td>1994-12-01</td><td>358</td></tr>
-	<tr><th scope=row>29</th><td>Canola</td><td>Saskatchewan</td><td>1995-12-01</td><td>358</td></tr>
-	<tr><th scope=row>30</th><td>Canola</td><td>Saskatchewan</td><td>1997-01-01</td><td>358</td></tr>
-	<tr><th scope=row>⋮</th><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr>
-	<tr><th scope=row>440</th><td>Canola</td><td>Saskatchewan</td><td>2012-09-01</td><td>570</td></tr>
-	<tr><th scope=row>441</th><td>Canola</td><td>Saskatchewan</td><td>2011-07-01</td><td>571</td></tr>
-	<tr><th scope=row>442</th><td>Canola</td><td>Saskatchewan</td><td>2008-05-01</td><td>574</td></tr>
-	<tr><th scope=row>443</th><td>Canola</td><td>Saskatchewan</td><td>2012-11-01</td><td>576</td></tr>
-	<tr><th scope=row>444</th><td>Canola</td><td>Saskatchewan</td><td>2011-06-01</td><td>577</td></tr>
-	<tr><th scope=row>445</th><td>Canola</td><td>Alberta     </td><td>2012-12-01</td><td>578</td></tr>
-	<tr><th scope=row>446</th><td>Canola</td><td>Saskatchewan</td><td>2012-05-01</td><td>585</td></tr>
-	<tr><th scope=row>447</th><td>Canola</td><td>Alberta     </td><td>2012-06-01</td><td>586</td></tr>
-	<tr><th scope=row>448</th><td>Canola</td><td>Saskatchewan</td><td>2012-12-01</td><td>588</td></tr>
-	<tr><th scope=row>449</th><td>Canola</td><td>Saskatchewan</td><td>2012-08-01</td><td>589</td></tr>
-	<tr><th scope=row>450</th><td>Canola</td><td>Saskatchewan</td><td>2008-07-01</td><td>592</td></tr>
-	<tr><th scope=row>451</th><td>Canola</td><td>Alberta     </td><td>2012-08-01</td><td>593</td></tr>
-	<tr><th scope=row>452</th><td>Canola</td><td>Saskatchewan</td><td>2008-06-01</td><td>594</td></tr>
-	<tr><th scope=row>453</th><td>Canola</td><td>Saskatchewan</td><td>2012-06-01</td><td>594</td></tr>
-	<tr><th scope=row>454</th><td>Canola</td><td>Alberta     </td><td>2012-07-01</td><td>595</td></tr>
-	<tr><th scope=row>455</th><td>Canola</td><td>Saskatchewan</td><td>2013-01-01</td><td>597</td></tr>
-	<tr><th scope=row>456</th><td>Canola</td><td>Alberta     </td><td>2013-01-01</td><td>600</td></tr>
-	<tr><th scope=row>457</th><td>Canola</td><td>Saskatchewan</td><td>2012-07-01</td><td>602</td></tr>
-	<tr><th scope=row>458</th><td>Canola</td><td>Alberta     </td><td>2013-02-01</td><td>611</td></tr>
-	<tr><th scope=row>459</th><td>Canola</td><td>Alberta     </td><td>2013-07-01</td><td>614</td></tr>
-	<tr><th scope=row>460</th><td>Canola</td><td>Saskatchewan</td><td>2013-07-01</td><td>616</td></tr>
-	<tr><th scope=row>461</th><td>Canola</td><td>Alberta     </td><td>2013-03-01</td><td>618</td></tr>
-	<tr><th scope=row>462</th><td>Canola</td><td>Alberta     </td><td>2013-04-01</td><td>630</td></tr>
-	<tr><th scope=row>463</th><td>Canola</td><td>Saskatchewan</td><td>2013-02-01</td><td>631</td></tr>
-	<tr><th scope=row>464</th><td>Canola</td><td>Alberta     </td><td>2013-06-01</td><td>638</td></tr>
-	<tr><th scope=row>465</th><td>Canola</td><td>Saskatchewan</td><td>2013-03-01</td><td>639</td></tr>
-	<tr><th scope=row>466</th><td>Canola</td><td>Saskatchewan</td><td>2013-04-01</td><td>640</td></tr>
-	<tr><th scope=row>467</th><td>Canola</td><td>Alberta     </td><td>2013-05-01</td><td>640</td></tr>
-	<tr><th scope=row>468</th><td>Canola</td><td>Saskatchewan</td><td>2013-06-01</td><td>646</td></tr>
-	<tr><th scope=row>469</th><td>Canola</td><td>Saskatchewan</td><td>2013-05-01</td><td>651</td></tr>
+	<tr><th scope=row>1</th><td>Canola</td><td>350</td><td>1985</td></tr>
+	<tr><th scope=row>2</th><td>Canola</td><td>350</td><td>1995</td></tr>
+	<tr><th scope=row>3</th><td>Canola</td><td>350</td><td>2003</td></tr>
+	<tr><th scope=row>4</th><td>Canola</td><td>350</td><td>2007</td></tr>
+	<tr><th scope=row>5</th><td>Canola</td><td>351</td><td>1999</td></tr>
+	<tr><th scope=row>6</th><td>Canola</td><td>351</td><td>2007</td></tr>
+	<tr><th scope=row>7</th><td>Canola</td><td>352</td><td>1997</td></tr>
+	<tr><th scope=row>8</th><td>Canola</td><td>352</td><td>1998</td></tr>
+	<tr><th scope=row>9</th><td>Canola</td><td>352</td><td>2003</td></tr>
+	<tr><th scope=row>10</th><td>Canola</td><td>352</td><td>2007</td></tr>
+	<tr><th scope=row>11</th><td>Canola</td><td>353</td><td>2002</td></tr>
+	<tr><th scope=row>12</th><td>Canola</td><td>353</td><td>2003</td></tr>
+	<tr><th scope=row>13</th><td>Canola</td><td>353</td><td>2007</td></tr>
+	<tr><th scope=row>14</th><td>Canola</td><td>354</td><td>1985</td></tr>
+	<tr><th scope=row>15</th><td>Canola</td><td>354</td><td>1988</td></tr>
+	<tr><th scope=row>16</th><td>Canola</td><td>354</td><td>2004</td></tr>
+	<tr><th scope=row>17</th><td>Canola</td><td>355</td><td>1998</td></tr>
+	<tr><th scope=row>18</th><td>Canola</td><td>356</td><td>2003</td></tr>
+	<tr><th scope=row>19</th><td>Canola</td><td>357</td><td>1994</td></tr>
+	<tr><th scope=row>20</th><td>Canola</td><td>357</td><td>2004</td></tr>
+	<tr><th scope=row>21</th><td>Canola</td><td>358</td><td>1994</td></tr>
+	<tr><th scope=row>22</th><td>Canola</td><td>358</td><td>1995</td></tr>
+	<tr><th scope=row>23</th><td>Canola</td><td>358</td><td>1997</td></tr>
+	<tr><th scope=row>24</th><td>Canola</td><td>358</td><td>2007</td></tr>
+	<tr><th scope=row>25</th><td>Canola</td><td>359</td><td>1985</td></tr>
+	<tr><th scope=row>26</th><td>Canola</td><td>359</td><td>1995</td></tr>
+	<tr><th scope=row>27</th><td>Canola</td><td>359</td><td>1996</td></tr>
+	<tr><th scope=row>28</th><td>Canola</td><td>360</td><td>1997</td></tr>
+	<tr><th scope=row>29</th><td>Canola</td><td>361</td><td>1996</td></tr>
+	<tr><th scope=row>30</th><td>Canola</td><td>362</td><td>1995</td></tr>
+	<tr><th scope=row>⋮</th><td>⋮</td><td>⋮</td><td>⋮</td></tr>
+	<tr><th scope=row>368</th><td>Canola</td><td>569</td><td>2012</td></tr>
+	<tr><th scope=row>369</th><td>Canola</td><td>570</td><td>2012</td></tr>
+	<tr><th scope=row>370</th><td>Canola</td><td>571</td><td>2011</td></tr>
+	<tr><th scope=row>371</th><td>Canola</td><td>574</td><td>2008</td></tr>
+	<tr><th scope=row>372</th><td>Canola</td><td>576</td><td>2012</td></tr>
+	<tr><th scope=row>373</th><td>Canola</td><td>577</td><td>2011</td></tr>
+	<tr><th scope=row>374</th><td>Canola</td><td>578</td><td>2012</td></tr>
+	<tr><th scope=row>375</th><td>Canola</td><td>585</td><td>2012</td></tr>
+	<tr><th scope=row>376</th><td>Canola</td><td>586</td><td>2012</td></tr>
+	<tr><th scope=row>377</th><td>Canola</td><td>588</td><td>2012</td></tr>
+	<tr><th scope=row>378</th><td>Canola</td><td>589</td><td>2012</td></tr>
+	<tr><th scope=row>379</th><td>Canola</td><td>592</td><td>2008</td></tr>
+	<tr><th scope=row>380</th><td>Canola</td><td>593</td><td>2012</td></tr>
+	<tr><th scope=row>381</th><td>Canola</td><td>594</td><td>2008</td></tr>
+	<tr><th scope=row>382</th><td>Canola</td><td>594</td><td>2012</td></tr>
+	<tr><th scope=row>383</th><td>Canola</td><td>595</td><td>2012</td></tr>
+	<tr><th scope=row>384</th><td>Canola</td><td>597</td><td>2013</td></tr>
+	<tr><th scope=row>385</th><td>Canola</td><td>600</td><td>2013</td></tr>
+	<tr><th scope=row>386</th><td>Canola</td><td>602</td><td>2012</td></tr>
+	<tr><th scope=row>387</th><td>Canola</td><td>611</td><td>2013</td></tr>
+	<tr><th scope=row>388</th><td>Canola</td><td>614</td><td>2013</td></tr>
+	<tr><th scope=row>389</th><td>Canola</td><td>616</td><td>2013</td></tr>
+	<tr><th scope=row>390</th><td>Canola</td><td>618</td><td>2013</td></tr>
+	<tr><th scope=row>391</th><td>Canola</td><td>630</td><td>2013</td></tr>
+	<tr><th scope=row>392</th><td>Canola</td><td>631</td><td>2013</td></tr>
+	<tr><th scope=row>393</th><td>Canola</td><td>638</td><td>2013</td></tr>
+	<tr><th scope=row>394</th><td>Canola</td><td>639</td><td>2013</td></tr>
+	<tr><th scope=row>395</th><td>Canola</td><td>640</td><td>2013</td></tr>
+	<tr><th scope=row>396</th><td>Canola</td><td>646</td><td>2013</td></tr>
+	<tr><th scope=row>397</th><td>Canola</td><td>651</td><td>2013</td></tr>
 </tbody>
 </table>
 
@@ -671,6 +669,28 @@ sqlQuery(conn,query)
 
 
 
+
+```R
+# Which crop performed best?
+query = "SELECT CROP_TYPE AS BEST_PERFORMING_CROP, AVG_YIELD AS TOP_YIELD FROM CROP_DATA 
+WHERE YEAR(YEAR)=2000 AND GEO='Saskatchewan' LIMIT 1"
+sqlQuery(conn,query)
+```
+
+
+<table>
+<caption>A data.frame: 1 × 2</caption>
+<thead>
+	<tr><th></th><th scope=col>BEST_PERFORMING_CROP</th><th scope=col>TOP_YIELD</th></tr>
+	<tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+	<tr><th scope=row>1</th><td>Barley</td><td>2800</td></tr>
+</tbody>
+</table>
+
+
+
 ## Problem 11
 #### Rank the crops and geographies by their average yield (KG per hectare) since the year 2000. Which crop and province had the highest average yield since the year 2000? 
 
@@ -680,8 +700,9 @@ sqlQuery(conn,query)
 
 
 ```R
-query = "SELECT GEO, CROP_TYPE, AVG_YIELD FROM CROP_DATA 
-WHERE YEAR(YEAR)>=2000 ORDER BY AVG_YIELD DESC LIMIT 10;"
+query = "SELECT CROP_TYPE, GEO, AVG_YIELD FROM CROP_DATA
+WHERE YEAR(YEAR) >=2000
+ORDER BY AVG_YIELD DESC LIMIT 10"
 sqlQuery(conn,query)
 ```
 
@@ -689,20 +710,44 @@ sqlQuery(conn,query)
 <table>
 <caption>A data.frame: 10 × 3</caption>
 <thead>
-	<tr><th></th><th scope=col>GEO</th><th scope=col>CROP_TYPE</th><th scope=col>AVG_YIELD</th></tr>
+	<tr><th></th><th scope=col>CROP_TYPE</th><th scope=col>GEO</th><th scope=col>AVG_YIELD</th></tr>
 	<tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th></tr>
 </thead>
 <tbody>
-	<tr><th scope=row>1</th><td>Alberta</td><td>Barley</td><td>4100</td></tr>
-	<tr><th scope=row>2</th><td>Alberta</td><td>Barley</td><td>4100</td></tr>
-	<tr><th scope=row>3</th><td>Alberta</td><td>Barley</td><td>3980</td></tr>
-	<tr><th scope=row>4</th><td>Alberta</td><td>Wheat </td><td>3900</td></tr>
-	<tr><th scope=row>5</th><td>Alberta</td><td>Barley</td><td>3900</td></tr>
-	<tr><th scope=row>6</th><td>Alberta</td><td>Wheat </td><td>3900</td></tr>
-	<tr><th scope=row>7</th><td>Canada </td><td>Barley</td><td>3900</td></tr>
-	<tr><th scope=row>8</th><td>Alberta</td><td>Barley</td><td>3890</td></tr>
-	<tr><th scope=row>9</th><td>Canada </td><td>Barley</td><td>3820</td></tr>
-	<tr><th scope=row>10</th><td>Canada </td><td>Barley</td><td>3810</td></tr>
+	<tr><th scope=row>1</th><td>Barley</td><td>Alberta</td><td>4100</td></tr>
+	<tr><th scope=row>2</th><td>Barley</td><td>Alberta</td><td>4100</td></tr>
+	<tr><th scope=row>3</th><td>Barley</td><td>Alberta</td><td>3980</td></tr>
+	<tr><th scope=row>4</th><td>Wheat </td><td>Alberta</td><td>3900</td></tr>
+	<tr><th scope=row>5</th><td>Barley</td><td>Alberta</td><td>3900</td></tr>
+	<tr><th scope=row>6</th><td>Wheat </td><td>Alberta</td><td>3900</td></tr>
+	<tr><th scope=row>7</th><td>Barley</td><td>Canada </td><td>3900</td></tr>
+	<tr><th scope=row>8</th><td>Barley</td><td>Alberta</td><td>3890</td></tr>
+	<tr><th scope=row>9</th><td>Barley</td><td>Canada </td><td>3820</td></tr>
+	<tr><th scope=row>10</th><td>Barley</td><td>Canada </td><td>3810</td></tr>
+</tbody>
+</table>
+
+
+
+
+```R
+# Which crop and province had the highest average yield since the year 2000?
+
+query = "SELECT CROP_TYPE, GEO, AVG_YIELD FROM CROP_DATA
+WHERE YEAR(YEAR) >=2000
+ORDER BY AVG_YIELD DESC LIMIT 1"
+sqlQuery(conn,query)
+```
+
+
+<table>
+<caption>A data.frame: 1 × 3</caption>
+<thead>
+	<tr><th></th><th scope=col>CROP_TYPE</th><th scope=col>GEO</th><th scope=col>AVG_YIELD</th></tr>
+	<tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+	<tr><th scope=row>1</th><td>Barley</td><td>Alberta</td><td>4100</td></tr>
 </tbody>
 </table>
 
