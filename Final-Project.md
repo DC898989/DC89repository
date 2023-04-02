@@ -646,7 +646,7 @@ sqlQuery(conn,query)
 
 
 ```R
-query = "SELECT CROP_TYPE, MAX(AVG_YIELD)AS AVG_YIELD_YEAR_2000 FROM CROP_DATA 
+query = "SELECT CROP_TYPE AS CROP_RANK, MAX(AVG_YIELD)AS AVG_YIELD_YEAR_2000 FROM CROP_DATA 
 WHERE YEAR(YEAR)=2000 AND GEO='Saskatchewan' 
 GROUP BY CROP_TYPE ORDER BY AVG_YIELD_YEAR_2000 desc"
 sqlQuery(conn,query)
@@ -656,7 +656,7 @@ sqlQuery(conn,query)
 <table>
 <caption>A data.frame: 4 × 2</caption>
 <thead>
-	<tr><th></th><th scope=col>CROP_TYPE</th><th scope=col>AVG_YIELD_YEAR_2000</th></tr>
+	<tr><th></th><th scope=col>CROP_RANK</th><th scope=col>AVG_YIELD_YEAR_2000</th></tr>
 	<tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th></tr>
 </thead>
 <tbody>
