@@ -110,12 +110,12 @@ The previous practice lab will help you accomplish this.
 ```R
 # Establish database connection
 dsn_driver <- "{IBM DB2 ODBC Driver}"
-dsn_database <- "bludb"
-dsn_hostname <- "ba99a9e6-d59e-4883-8fc0-d6a8c9f7a08f.c1ogj3sd0tgtu0lqde00.databases.appdomain.cloud"
-dsn_port <- "31321"
-dsn_protocol <- "TCPIP"
-dsn_uid <- "zlp27910"
-dsn_pwd <- "cIFvdMSoDFIDm1mU" 
+dsn_database <- "..."
+dsn_hostname <- "..."
+dsn_port <- "..."
+dsn_protocol <- "..."
+dsn_uid <- "..."
+dsn_pwd <- "..." 
 dsn_security <- "ssl"
 
 conn_path <- paste("DRIVER=",dsn_driver,
